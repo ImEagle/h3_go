@@ -1,6 +1,7 @@
 package lod
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 )
@@ -29,6 +30,9 @@ func TestReader_LoadMetadata(t *testing.T) {
 			if got := r.LoadMetadata(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("LoadMetadata() = %v, want %v", got, tt.want)
 			}
+
+			data, err := r.GetFile("hctraits.txt")
+			fmt.Print(data, err)
 		})
 	}
 }

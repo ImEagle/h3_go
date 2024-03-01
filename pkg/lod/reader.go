@@ -2,10 +2,12 @@ package lod
 
 import (
 	"bytes"
+	"compress/zlib"
 	"encoding/binary"
 	"fmt"
 	"io"
 	"os"
+	"strings"
 )
 
 const FILE_NAME_LENGTH = 16
@@ -88,10 +90,68 @@ func (r *Reader) LoadMetadata() error {
 		}
 		// ----- ~ Read file metadata ~ -----
 
-		r.metadata[fileName] = metadata
+		r.metadata[strings.ToLower(fileName)] = metadata
 	}
 
 	return nil
+}
+
+func (r *Reader) GetFile(fileName string) ([]byte, error) {
+	metadata, ok := r.metadata[strings.ToLower(fileName)]
+	if !ok {
+		return nil, fmt.Errorf("file not found: %s", fileName)
+	}
+
+	f, err := os.OpenFile(r.fileName, os.O_RDONLY, 0644)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	_, err = f.Seek(int64(metadata.Offset), io.SeekStart)
+	if err != nil {
+		return nil, err
+	}
+
+	var data []byte
+
+	if metadata.Csize == 0 {
+		// Raw file
+		data := make([]byte, metadata.Size)
+		_, err = f.Read(data)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		// Compressed file
+		tmpData := make([]byte, metadata.Csize)
+		_, err = f.Read(tmpData)
+		if err != nil {
+			return nil, err
+		}
+
+		cReader := bytes.NewReader(tmpData)
+		zReader, err := zlib.NewReader(cReader)
+		if err != nil {
+			return nil, err
+		}
+		defer zReader.Close()
+
+		fileData, err := io.ReadAll(zReader)
+		if err != nil {
+			return nil, err
+		}
+		data = make([]byte, len(fileData))
+		data = fileData
+	}
+
+	// EncodeImage
+	pcx := isPCX(data)
+	if pcx {
+		// Handle image(?)
+	}
+
+	return data, nil
 }
 
 func readInt32(f *os.File) (int32, error) {
