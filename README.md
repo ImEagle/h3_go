@@ -1,5 +1,7 @@
 # Heroes 3
 
+![logo](https://github.com/ImEagle/h3_go/assets/2922754/68731669-1d8a-4524-ba4b-f2b40e1b4e9c)
+
 This project aims to recreate the classic game Heroes of Might and Magic III (Heroes3) using the Go programming language. The primary focus of the initial phase is to implement essential components such as map reader, sprite reader, map renderer, and map movement mechanics.
 
 ## Project Goals
@@ -28,3 +30,4 @@ This project is licensed under the MIT License.
 # Disclaimer
 
 This project is not affiliated with or endorsed by the creators of Heroes of Might and Magic III. It is a fan-made recreation for educational and entertainment purposes.
+
