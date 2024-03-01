@@ -31,7 +31,8 @@ func TestReader_LoadMetadata(t *testing.T) {
 				t.Errorf("LoadMetadata() = %v, want %v", got, tt.want)
 			}
 
-			data, err := r.GetFile("hctraits.txt")
+			data, err := r.GetFile("sgelwa5.pcx")
+			//_, _ = r.GetFile("ara_cobl.pcx")
 			fmt.Print(data, err)
 		})
 	}

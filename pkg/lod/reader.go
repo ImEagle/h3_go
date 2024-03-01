@@ -148,7 +148,18 @@ func (r *Reader) GetFile(fileName string) ([]byte, error) {
 	// EncodeImage
 	pcx := isPCX(data)
 	if pcx {
-		// Handle image(?)
+		pcxImg := pcxToImage(data)
+		pngData, err := imageToBytes(pcxImg)
+		if err != nil {
+			return nil, err
+		}
+
+		// debug
+		err = imageToFile(pcxImg, "/Users/eagle/tmp/"+fileName+".png")
+		if err != nil {
+			panic(err)
+		}
+		return pngData, nil
 	}
 
 	return data, nil
