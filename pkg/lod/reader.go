@@ -50,15 +50,15 @@ func (r *Reader) LoadMetadata() error {
 	}
 	defer f.Close()
 
-	// ----- Read header -----
+	// ----- Load header -----
 	header := make([]byte, 4)
 	if _, err := f.Read(header); err != nil {
 		return err
 	}
 
-	// ----- ~ Read header ~ -----
+	// ----- ~ Load header ~ -----
 
-	// ----- Read file count -----
+	// ----- Load file count -----
 	_fileCountOffset := int64(8) // TODO: Magic number
 	_, err = f.Seek(_fileCountOffset, io.SeekStart)
 	if err != nil {
@@ -70,9 +70,9 @@ func (r *Reader) LoadMetadata() error {
 		return err
 	}
 	fmt.Printf("Total files %d\n", fileCount)
-	// ----- ~ Read file count ~ -----
+	// ----- ~ Load file count ~ -----
 
-	// ----- Read file list -----
+	// ----- Load file list -----
 	_fileDataOffset := int64(92) // TODO: Magic number
 	_, err = f.Seek(_fileDataOffset, io.SeekStart)
 
@@ -82,13 +82,13 @@ func (r *Reader) LoadMetadata() error {
 			return err
 		}
 
-		// ----- Read file metadata -----
+		// ----- Load file metadata -----
 		var metadata fileMetadata
 		err = binary.Read(f, binary.LittleEndian, &metadata)
 		if err != nil {
 			return err
 		}
-		// ----- ~ Read file metadata ~ -----
+		// ----- ~ Load file metadata ~ -----
 
 		r.metadata[strings.ToLower(fileName)] = metadata
 	}
