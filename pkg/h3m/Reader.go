@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"encoding/binary"
+	"fmt"
 	"github.com/ImEagle/h3_go/pkg/h3m/models"
 	"io"
 	"os"
@@ -84,16 +85,25 @@ func loadBasicMapParameters(decompressedMap io.Reader, h3m *H3m) error {
 	return nil
 }
 
-func loadPlayersData(decompressedMap io.Reader, h3m *H3m) error {
+func loadPlayersData(decompressedMap io.ReadSeeker, h3m *H3m) error {
 	//  Red, Blue, Tan, Green, Orange, Purple, Teal, Pink
 	//  0,   1,    2,   3,     4,     5,      6,    7
 
 	var heroesMaxLevel uint8 // max level of each hero separately ?
+
+	currentOffset, err := decompressedMap.Seek(0, io.SeekCurrent)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Current offset: %d\n", currentOffset)
+
 	binary.Read(decompressedMap, binary.LittleEndian, &heroesMaxLevel)
 
 	for i := 0; i < 8; i++ {
 		var player models.SPlayer
 		var fullPlayer models.Player
+		fmt.Printf("Player %d Current offset: %d\n", i, currentOffset)
 		binary.Read(decompressedMap, binary.LittleEndian, &player)
 
 		fullPlayer.SPlayer = &player
@@ -104,26 +114,56 @@ func loadPlayersData(decompressedMap io.Reader, h3m *H3m) error {
 			fullPlayer.TownCoordinates = &townCoordinates
 		}
 
+		// Player main hero
+		var fullHero models.MainHero
+		var hero models.SMainHero
+		binary.Read(decompressedMap, binary.LittleEndian, &hero)
+
+		fullHero.SMainHero = &hero
+
+		fullHero.Name, err = readString(decompressedMap)
+		if err != nil {
+			return err
+		}
+
+		binary.Read(decompressedMap, binary.LittleEndian, &fullHero.Unknown)
+
+		var heroesCount uint32
+		binary.Read(decompressedMap, binary.LittleEndian, &heroesCount)
+
+		for j := uint32(0); j < heroesCount; j++ {
+			var heroId uint8
+			binary.Read(decompressedMap, binary.LittleEndian, &heroId)
+
+			heroName, err := readString(decompressedMap)
+			if err != nil {
+				return err
+			}
+
+			fullHero.Heroes = append(fullHero.Heroes, &models.HeroDetails{
+				Id:   heroId,
+				Name: heroName,
+			})
+
+		}
+
 		h3m.Players = append(h3m.Players, &fullPlayer)
 	}
 
 	return nil
 }
 
-func decompressGZIP(gzipedR io.Reader) (io.Reader, error) {
+func decompressGZIP(gzipedR io.Reader) (io.ReadSeeker, error) {
 	r, err := gzip.NewReader(gzipedR)
 	if err != nil {
 		return nil, err
 	}
 	defer r.Close()
 
-	var out bytes.Buffer
-	_, err = io.Copy(&out, r)
-	if err != nil {
-		return nil, err
-	}
+	b, err := io.ReadAll(r)
+	out := bytes.NewReader(b)
 
-	return &out, nil
+	return out, nil
 }
 
 func readString(r io.Reader) (string, error) {

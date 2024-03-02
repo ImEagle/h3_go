@@ -8,6 +8,25 @@ type TownCoordinates struct {
 	Z          uint8
 }
 
+type SMainHero struct {
+	HaveRandomHero bool
+	HeroType       uint8
+	HeroFace       uint8
+}
+
+type HeroDetails struct {
+	Id   uint8
+	Name string
+}
+
+type MainHero struct {
+	*SMainHero
+	Name    string
+	Unknown uint8
+
+	Heroes []*HeroDetails
+}
+
 type Player struct {
 	*SPlayer
 	TownCoordinates *TownCoordinates

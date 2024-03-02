@@ -9,7 +9,7 @@ type H3m struct {
 	HasUnderground bool
 	Name           string
 	Description    string
-	Difficulty     uint32
+	Difficulty     byte
 
 	Players []*models.Player
 }
