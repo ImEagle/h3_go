@@ -10,7 +10,7 @@ type TownCoordinates struct {
 
 type SMainHero struct {
 	HaveRandomHero bool
-	HeroType       uint8
+	HeroType       uint8 // # TODO: Fix (when FF - there's no hero) and the following bytes are absent:
 	HeroFace       uint8
 }
 

@@ -103,6 +103,11 @@ func loadPlayersData(decompressedMap io.ReadSeeker, h3m *H3m) error {
 	for i := 0; i < 8; i++ {
 		var player models.SPlayer
 		var fullPlayer models.Player
+
+		currentOffset, err := decompressedMap.Seek(0, io.SeekCurrent)
+		if err != nil {
+			return err
+		}
 		fmt.Printf("Player %d Current offset: %d\n", i, currentOffset)
 		binary.Read(decompressedMap, binary.LittleEndian, &player)
 
@@ -116,7 +121,7 @@ func loadPlayersData(decompressedMap io.ReadSeeker, h3m *H3m) error {
 
 		// Player main hero
 		var fullHero models.MainHero
-		var hero models.SMainHero
+		var hero models.SMainHero // TODO: Fix: (when FF - there's no hero) and the following bytes are absent:
 		binary.Read(decompressedMap, binary.LittleEndian, &hero)
 
 		fullHero.SMainHero = &hero
