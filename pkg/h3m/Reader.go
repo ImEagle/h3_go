@@ -126,16 +126,17 @@ func loadPlayersData(decompressedMap io.ReadSeeker, h3m *H3m) error {
 		var heroType uint8
 		binary.Read(decompressedMap, binary.LittleEndian, &heroType)
 
-		if heroType == 0xFF {
-			continue
-		}
-
 		var heroFace uint8
 		binary.Read(decompressedMap, binary.LittleEndian, &heroFace)
 
 		heroName, err := readString(decompressedMap.(io.Reader))
 		if err != nil {
 			return err
+		}
+
+		if heroName == "" {
+			h3m.Players = append(h3m.Players, &fullPlayer)
+			continue
 		}
 
 		var fullHero models.MainHero
