@@ -120,18 +120,29 @@ func loadPlayersData(decompressedMap io.ReadSeeker, h3m *H3m) error {
 		}
 
 		// Player main hero
-		var fullHero models.MainHero
-		var hero models.SMainHero // TODO: Fix: (when FF - there's no hero) and the following bytes are absent:
-		binary.Read(decompressedMap, binary.LittleEndian, &hero)
+		var haveRandomHero bool
+		binary.Read(decompressedMap, binary.LittleEndian, &haveRandomHero)
 
-		fullHero.SMainHero = &hero
+		var heroType uint8
+		binary.Read(decompressedMap, binary.LittleEndian, &heroType)
 
-		fullHero.Name, err = readString(decompressedMap)
+		if heroType == 0xFF {
+			continue
+		}
+
+		var heroFace uint8
+		binary.Read(decompressedMap, binary.LittleEndian, &heroFace)
+
+		heroName, err := readString(decompressedMap.(io.Reader))
 		if err != nil {
 			return err
 		}
 
-		binary.Read(decompressedMap, binary.LittleEndian, &fullHero.Unknown)
+		var fullHero models.MainHero
+		fullHero.Name = heroName
+
+		var unknown uint8
+		binary.Read(decompressedMap, binary.LittleEndian, &unknown)
 
 		var heroesCount uint32
 		binary.Read(decompressedMap, binary.LittleEndian, &heroesCount)
