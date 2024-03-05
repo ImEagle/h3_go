@@ -60,7 +60,56 @@ func Load(fileName string) (*H3m, error) {
 
 	// ----- ~ Load players data ~ -----
 
+	// ----- Load victory condition -----
+	err = loadVictoryCondition(decompressedMap, h3m)
+	// ----- ~ Load victory condition ~ -----
+
+	// ----- Load loss condition -----
+	err = loadLossCondition(decompressedMap, h3m)
+	// ----- ~ Load loss condition ~ -----
+
 	return h3m, nil
+}
+
+func loadVictoryCondition(decompressedMap io.ReadSeeker, m *H3m) error {
+	currentOffset, err := decompressedMap.Seek(0, io.SeekCurrent)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Victory condition offset: %d\n", currentOffset)
+
+	var victoryCondition models.VictoryCondition
+	binary.Read(decompressedMap, binary.LittleEndian, &victoryCondition.Type)
+
+	if victoryCondition.Type != 255 {
+		// TODO: victoryCondition
+		panic("Victory conditions not implemented")
+	}
+
+	m.VictoryCondition = &victoryCondition
+
+	return nil
+}
+
+func loadLossCondition(decompressedMap io.ReadSeeker, m *H3m) error {
+	currentOffset, err := decompressedMap.Seek(0, io.SeekCurrent)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Loss condition offset: %d\n", currentOffset)
+
+	var lossCondition models.LoseCondition
+	binary.Read(decompressedMap, binary.LittleEndian, &lossCondition.Type)
+
+	if lossCondition.Type != 255 {
+		panic("Loss conditions not implemented")
+	}
+
+	m.LossCondition = &lossCondition
+
+	return nil
 }
 
 func loadBasicMapParameters(decompressedMap io.Reader, h3m *H3m) error {

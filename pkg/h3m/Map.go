@@ -11,5 +11,7 @@ type H3m struct {
 	Description    string
 	Difficulty     byte
 
-	Players []*models.Player
+	Players          []*models.Player
+	VictoryCondition *models.VictoryCondition
+	LossCondition    *models.LoseCondition
 }
