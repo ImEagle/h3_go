@@ -68,7 +68,40 @@ func Load(fileName string) (*H3m, error) {
 	err = loadLossCondition(decompressedMap, h3m)
 	// ----- ~ Load loss condition ~ -----
 
+	// ----- Load teams -----
+	err = loadTeams(decompressedMap, h3m)
+	// ----- ~ Load teams ~ -----
+
 	return h3m, nil
+}
+
+func loadTeams(decompressedMap io.ReadSeeker, m *H3m) error {
+	currentOffset, err := decompressedMap.Seek(0, io.SeekCurrent)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Teams offset: %d\n", currentOffset)
+
+	var numberOfTeams uint8
+	err = binary.Read(decompressedMap, binary.LittleEndian, &numberOfTeams)
+	if err != nil {
+		return err
+	}
+
+	if numberOfTeams == 0 {
+		return nil
+	}
+
+	var teamColors models.TeamColors
+	err = binary.Read(decompressedMap, binary.LittleEndian, &teamColors.Red)
+	if err != nil {
+		return err
+	}
+
+	m.TeamColors = &teamColors
+
+	return nil
 }
 
 func loadVictoryCondition(decompressedMap io.ReadSeeker, m *H3m) error {

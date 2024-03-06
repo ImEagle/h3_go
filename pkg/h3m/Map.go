@@ -14,4 +14,5 @@ type H3m struct {
 	Players          []*models.Player
 	VictoryCondition *models.VictoryCondition
 	LossCondition    *models.LoseCondition
+	TeamColors       *models.TeamColors
 }
