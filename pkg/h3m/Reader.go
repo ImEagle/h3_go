@@ -72,7 +72,28 @@ func Load(fileName string) (*H3m, error) {
 	err = loadTeams(decompressedMap, h3m)
 	// ----- ~ Load teams ~ -----
 
+	// ----- Load available heroes -----
+	err = loadAvailableHeroes(decompressedMap, h3m)
+	// ----- ~ Load available heroes ~ -----
+
 	return h3m, nil
+}
+
+func loadAvailableHeroes(decompressedMap io.ReadSeeker, m *H3m) error {
+	currentOffset, err := decompressedMap.Seek(0, io.SeekCurrent)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Teams offset: %d\n", currentOffset)
+
+	var availableHeroes models.AvailableHeroes
+
+	err = binary.Read(decompressedMap, binary.LittleEndian, &availableHeroes)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func loadTeams(decompressedMap io.ReadSeeker, m *H3m) error {
