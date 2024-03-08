@@ -76,7 +76,55 @@ func Load(fileName string) (*H3m, error) {
 	err = loadAvailableHeroes(decompressedMap, h3m)
 	// ----- ~ Load available heroes ~ -----
 
+	// ----- NOP -----
+	decompressedMap.Seek(1, io.SeekCurrent)
+	// ----- ~ NOP ~ -----
+
+	// ----- Load custom heroes -----
+	err = loadCustomHeroes(decompressedMap, h3m)
+	// ----- ~ Load custom heroes ~ -----
+
 	return h3m, nil
+}
+
+func loadCustomHeroes(decompressedMap io.ReadSeeker, m *H3m) error {
+	currentOffset, err := decompressedMap.Seek(0, io.SeekCurrent)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Custom heroes offset: %d\n", currentOffset)
+
+	var customHeroesCount uint8
+	err = binary.Read(decompressedMap, binary.LittleEndian, &customHeroesCount)
+
+	for i := uint8(0); i < customHeroesCount; i++ {
+		var customHero models.CustomHeroes
+
+		err := binary.Read(decompressedMap, binary.LittleEndian, &customHero.Id)
+		if err != nil {
+			return err
+		}
+
+		err = binary.Read(decompressedMap, binary.LittleEndian, &customHero.Portrait)
+		if err != nil {
+			return err
+		}
+
+		customHero.Name, err = readString(decompressedMap)
+		if err != nil {
+			return err
+		}
+
+		err = binary.Read(decompressedMap, binary.LittleEndian, &customHero.CanBeHired)
+		if err != nil {
+			return err
+		}
+
+		m.CustomHeroes = append(m.CustomHeroes, &customHero)
+	}
+
+	return nil
 }
 
 func loadAvailableHeroes(decompressedMap io.ReadSeeker, m *H3m) error {
