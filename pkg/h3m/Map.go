@@ -16,4 +16,5 @@ type H3m struct {
 	LossCondition    *models.LoseCondition
 	TeamColors       *models.TeamColors
 	CustomHeroes     []*models.CustomHeroes
+	Artifacts        [18]byte
 }

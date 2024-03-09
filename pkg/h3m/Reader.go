@@ -77,14 +77,36 @@ func Load(fileName string) (*H3m, error) {
 	// ----- ~ Load available heroes ~ -----
 
 	// ----- NOP -----
-	decompressedMap.Seek(1, io.SeekCurrent)
+	// 4 empty bytes
+	decompressedMap.Seek(4, io.SeekCurrent)
 	// ----- ~ NOP ~ -----
 
 	// ----- Load custom heroes -----
 	err = loadCustomHeroes(decompressedMap, h3m)
 	// ----- ~ Load custom heroes ~ -----
 
+	// ----- NOP -----
+	// 31 empty bytes
+	decompressedMap.Seek(31, io.SeekCurrent)
+	// ----- ~ NOP ~ -----
+
+	// ----- Load random artifacts -----
+	err = loadRandomArtifacts(decompressedMap, h3m)
+	// ----- ~ Load random artifacts ~ -----
+
 	return h3m, nil
+}
+
+func loadRandomArtifacts(decompressedMap io.ReadSeeker, m *H3m) error {
+	currentOffset, err := decompressedMap.Seek(0, io.SeekCurrent)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Random artifacts: %d\n", currentOffset)
+
+	// 18 bytes for artifacts
+	return binary.Read(decompressedMap, binary.LittleEndian, &m.Artifacts)
 }
 
 func loadCustomHeroes(decompressedMap io.ReadSeeker, m *H3m) error {
