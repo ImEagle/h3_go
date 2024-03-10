@@ -94,7 +94,42 @@ func Load(fileName string) (*H3m, error) {
 	err = loadRandomArtifacts(decompressedMap, h3m)
 	// ----- ~ Load random artifacts ~ -----
 
+	// ----- Rumors -----
+	err = loadRumors(decompressedMap, h3m)
+	// ----- ~ Rumors ~ -----
+
 	return h3m, nil
+}
+
+func loadRumors(decompressedMap io.ReadSeeker, m *H3m) error {
+	currentOffset, err := decompressedMap.Seek(0, io.SeekCurrent)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Rumors: %d\n", currentOffset)
+
+	var rumorsCount uint32
+	err = binary.Read(decompressedMap, binary.LittleEndian, &rumorsCount)
+
+	for i := uint32(0); i < rumorsCount; i++ {
+		var rumor models.Rumor
+
+		rumor.Name, err = readString(decompressedMap)
+		if err != nil {
+			return err
+		}
+
+		rumor.Text, err = readString(decompressedMap)
+		if err != nil {
+			return err
+		}
+
+		m.Rumors = append(m.Rumors, &rumor)
+
+	}
+
+	return nil
 }
 
 func loadRandomArtifacts(decompressedMap io.ReadSeeker, m *H3m) error {
