@@ -18,4 +18,5 @@ type H3m struct {
 	CustomHeroes     []*models.CustomHeroes
 	Artifacts        [18]byte
 	Rumors           []*models.Rumor
+	Heroes           []*models.Hero
 }

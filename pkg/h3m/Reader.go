@@ -98,7 +98,111 @@ func Load(fileName string) (*H3m, error) {
 	err = loadRumors(decompressedMap, h3m)
 	// ----- ~ Rumors ~ -----
 
+	// ----- Hero settings -----
+	err = loadHeroSettings(decompressedMap, h3m)
+	// ----- ~ Hero settings ~ -----
+
 	return h3m, nil
+}
+
+func loadHeroSettings(decompressedMap io.ReadSeeker, m *H3m) error {
+	var heroDetails []*models.Hero
+
+	const HeroesCount = 156
+	for i := 0; i < HeroesCount; i++ {
+		var customHero bool
+		binary.Read(decompressedMap, binary.LittleEndian, &customHero)
+		if !customHero {
+			continue
+		}
+
+		var hd models.Hero
+
+		var customExperience bool
+		binary.Read(decompressedMap, binary.LittleEndian, &customExperience)
+		if customExperience {
+			binary.Read(decompressedMap, binary.LittleEndian, &hd.Experience)
+		}
+
+		var customSecondarySkills bool
+		binary.Read(decompressedMap, binary.LittleEndian, &customSecondarySkills)
+
+		// Secondary skills
+		if customSecondarySkills {
+			var secondarySkillsCount uint32
+			binary.Read(decompressedMap, binary.LittleEndian, &secondarySkillsCount)
+
+			for j := uint32(0); j < secondarySkillsCount; j++ {
+				var secondarySkill models.SecondarySkill
+				binary.Read(decompressedMap, binary.LittleEndian, &secondarySkill)
+				hd.SecondarySkills = append(hd.SecondarySkills, &secondarySkill)
+			}
+		}
+
+		// Artifacts
+		var customArtifacts bool
+		binary.Read(decompressedMap, binary.LittleEndian, &customArtifacts)
+		if customArtifacts {
+			binary.Read(decompressedMap, binary.LittleEndian, &hd.ArtifactsDetails)
+
+			// Backpack
+			var backpackCount uint16
+			binary.Read(decompressedMap, binary.LittleEndian, &backpackCount)
+
+			for j := uint16(0); j < backpackCount; j++ {
+				var art models.ArtifactId
+				binary.Read(decompressedMap, binary.LittleEndian, &art)
+
+				hd.ArtifactsDetails.Backpack = append(hd.ArtifactsDetails.Backpack, &art)
+			}
+		}
+
+		// Biography
+		var customBiography bool
+		binary.Read(decompressedMap, binary.LittleEndian, &customBiography)
+
+		if customBiography {
+			var err error
+			hd.Biography, err = readString(decompressedMap)
+			if err != nil {
+				return nil
+			}
+		}
+
+		// Gender
+		var customGender bool
+		binary.Read(decompressedMap, binary.LittleEndian, &customGender)
+
+		if customGender {
+			binary.Read(decompressedMap, binary.LittleEndian, &hd.Gender)
+		}
+
+		// Spells
+		var customSpells bool
+		binary.Read(decompressedMap, binary.LittleEndian, &customSpells)
+
+		if customSpells {
+			hd.Spells = make([]byte, 9)
+			binary.Read(decompressedMap, binary.LittleEndian, &hd.Spells)
+		}
+
+		// Primary skills
+		var customPrimarySkills bool
+		binary.Read(decompressedMap, binary.LittleEndian, &customPrimarySkills)
+
+		if customPrimarySkills {
+			binary.Read(decompressedMap, binary.LittleEndian, &hd.PrimaryAttack)
+			binary.Read(decompressedMap, binary.LittleEndian, &hd.PrimaryDefence)
+			binary.Read(decompressedMap, binary.LittleEndian, &hd.PrimarySpellPower)
+			binary.Read(decompressedMap, binary.LittleEndian, &hd.PrimaryKnowledge)
+		}
+
+		heroDetails = append(heroDetails, &hd)
+	}
+
+	m.Heroes = heroDetails
+
+	return nil
 }
 
 func loadRumors(decompressedMap io.ReadSeeker, m *H3m) error {
