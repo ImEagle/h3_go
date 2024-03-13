@@ -1,6 +1,7 @@
 package h3m
 
 import (
+	"github.com/ImEagle/h3_go/pkg/h3m/models"
 	"reflect"
 	"testing"
 )
@@ -137,6 +138,153 @@ func Test_loadBasicMapParameters(t *testing.T) {
 			if h3m.Description != tt.expectedBasicParams.Description {
 				t.Errorf("loadBasicMapParameters.Description got = %v, want %v", h3m.Description, tt.expectedBasicParams.Description)
 				return
+			}
+		})
+	}
+}
+
+func Test_loadPlayersData(t *testing.T) {
+	type args struct {
+		mapFileName string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+		players []models.Player
+	}{
+		{
+			name:    "test_1.h3m",
+			args:    args{mapFileName: "test_maps/test_1.h3m"},
+			wantErr: false,
+			players: []models.Player{
+				{
+					SPlayer: &models.SPlayer{
+						PlayableByHuman:    true,
+						PlayableByComputer: true,
+						Behavior:           0,
+						SetTowns:           0,
+						Towns:              256,
+						HasRandomTown:      false,
+						HasMainTown:        true,
+					},
+					TownCoordinates: &models.TownCoordinates{
+						CreateHero: true,
+						TownType:   models.TownConflux,
+						X:          25,
+						Y:          19,
+						Z:          0,
+					},
+				},
+				{
+					SPlayer: &models.SPlayer{
+						PlayableByHuman:    true,
+						PlayableByComputer: true,
+						Behavior:           0,
+						SetTowns:           0,
+						Towns:              2,
+						HasRandomTown:      false,
+						HasMainTown:        true,
+					},
+					TownCoordinates: &models.TownCoordinates{
+						CreateHero: true,
+						TownType:   models.TownRampart,
+						X:          17,
+						Y:          7,
+						Z:          0,
+					},
+				},
+				{
+					SPlayer: &models.SPlayer{
+						PlayableByHuman:    false,
+						PlayableByComputer: true,
+						Behavior:           0,
+						SetTowns:           0,
+						Towns:              32,
+						HasRandomTown:      false,
+						HasMainTown:        true,
+					},
+					TownCoordinates: &models.TownCoordinates{
+						CreateHero: true,
+						TownType:   models.TownDungeon,
+						X:          8,
+						Y:          29,
+						Z:          0,
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			h3m, err := Load(tt.args.mapFileName)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("loadPlayersData() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+
+			for i, expectedPlayer := range tt.players {
+				mapPlayer := h3m.Players[i]
+
+				if mapPlayer.PlayableByHuman != expectedPlayer.PlayableByHuman {
+					t.Errorf("loadBasicMapParameters.loadPlayersData.PlayableByHuman (Player %d) got = %v, want %v", i, mapPlayer.PlayableByHuman, expectedPlayer.PlayableByHuman)
+					return
+				}
+
+				if mapPlayer.PlayableByComputer != expectedPlayer.PlayableByComputer {
+					t.Errorf("loadBasicMapParameters.loadPlayersData.PlayableByComputer (Player %d) got = %v, want %v", i, mapPlayer.PlayableByComputer, expectedPlayer.PlayableByComputer)
+					return
+				}
+
+				if mapPlayer.Behavior != expectedPlayer.Behavior {
+					t.Errorf("loadBasicMapParameters.loadPlayersData.Behavior (Player %d) got = %v, want %v", i, mapPlayer.Behavior, expectedPlayer.Behavior)
+					return
+				}
+
+				if mapPlayer.SetTowns != expectedPlayer.SetTowns {
+					t.Errorf("loadBasicMapParameters.loadPlayersData.SetTowns (Player %d) got = %v, want %v", i, mapPlayer.SetTowns, expectedPlayer.SetTowns)
+					return
+				}
+
+				if mapPlayer.Towns != expectedPlayer.Towns {
+					t.Errorf("loadBasicMapParameters.loadPlayersData.Towns (Player %d) got = %v, want %v", i, mapPlayer.Towns, expectedPlayer.Towns)
+					return
+				}
+
+				if mapPlayer.HasRandomTown != expectedPlayer.HasRandomTown {
+					t.Errorf("loadBasicMapParameters.loadPlayersData.HasRandomTown (Player %d) got = %v, want %v", i, mapPlayer.HasRandomTown, expectedPlayer.HasRandomTown)
+					return
+				}
+
+				if mapPlayer.HasMainTown != expectedPlayer.HasMainTown {
+					t.Errorf("loadBasicMapParameters.loadPlayersData.HasMainTown (Player %d) got = %v, want %v", i, mapPlayer.HasMainTown, expectedPlayer.HasMainTown)
+					return
+				}
+
+				if mapPlayer.TownCoordinates.CreateHero != expectedPlayer.TownCoordinates.CreateHero {
+					t.Errorf("loadBasicMapParameters.loadPlayersData.TownCoordinates.CreateHero (Player %d) got = %v, want %v", i, mapPlayer.TownCoordinates.CreateHero, expectedPlayer.TownCoordinates.CreateHero)
+					return
+				}
+
+				if mapPlayer.TownCoordinates.TownType != expectedPlayer.TownCoordinates.TownType {
+					t.Errorf("loadBasicMapParameters.loadPlayersData.TownCoordinates.TownType (Player %d) got = %v, want %v", i, mapPlayer.TownCoordinates.TownType, expectedPlayer.TownCoordinates.TownType)
+					return
+				}
+
+				if mapPlayer.TownCoordinates.X != expectedPlayer.TownCoordinates.X {
+					t.Errorf("loadBasicMapParameters.loadPlayersData.TownCoordinates.X (Player %d) got = %v, want %v", i, mapPlayer.TownCoordinates.X, expectedPlayer.TownCoordinates.X)
+					return
+				}
+
+				if mapPlayer.TownCoordinates.Y != expectedPlayer.TownCoordinates.Y {
+					t.Errorf("loadBasicMapParameters.loadPlayersData.TownCoordinates.Y (Player %d) got = %v, want %v", i, mapPlayer.TownCoordinates.Y, expectedPlayer.TownCoordinates.Y)
+					return
+				}
+
+				if mapPlayer.TownCoordinates.Z != expectedPlayer.TownCoordinates.Z {
+					t.Errorf("loadBasicMapParameters.loadPlayersData.TownCoordinates.Z (Player %d) got = %v, want %v", i, mapPlayer.TownCoordinates.Z, expectedPlayer.TownCoordinates.Z)
+					return
+				}
 			}
 		})
 	}

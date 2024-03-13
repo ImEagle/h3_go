@@ -1,5 +1,21 @@
 package models
 
+const (
+	TownCastle     = 0
+	TownRampart    = 1
+	TownTower      = 2
+	TownInferno    = 3
+	TownNecropolis = 4
+	TownDungeon    = 5
+	TownStronghold = 6
+	TownFortress   = 7
+	TownConflux    = 8 // Armageddon's Blade
+
+	// Different game version?
+	// TownCove    = 9  // Horn of the Abyss
+	// TownFactory = 10 // Horn of the Abyss
+)
+
 type TownCoordinates struct {
 	CreateHero bool
 	TownType   uint8
