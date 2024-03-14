@@ -289,3 +289,49 @@ func Test_loadPlayersData(t *testing.T) {
 		})
 	}
 }
+
+func Test_loadRumors(t *testing.T) {
+	type args struct {
+		mapFileName string
+	}
+	tests := []struct {
+		name   string
+		args   args
+		rumors []models.Rumor
+	}{
+		{
+			name: "test_1.h3m",
+			args: args{mapFileName: "test_maps/test_1.h3m"},
+			rumors: []models.Rumor{
+				{
+					Name: "Rumor 1",
+					Text: "Example rumor 1",
+				},
+				{
+					Name: "Rumor 2",
+					Text: "Example rumor 2",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			h3m, err := Load(tt.args.mapFileName)
+			if err != nil {
+				t.Errorf("loadRumors() error = %v", err)
+				return
+			}
+
+			if len(h3m.Rumors) != len(tt.rumors) {
+				t.Errorf("loadRumors() got = %v, want %v", h3m.Rumors, tt.rumors)
+				return
+
+			}
+
+			if h3m.Rumors != nil {
+				t.Errorf("loadRumors() got = %v, want %v", h3m.Rumors, nil)
+				return
+			}
+		})
+	}
+}
