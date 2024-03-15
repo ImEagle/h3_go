@@ -94,6 +94,12 @@ func Load(fileName string) (*H3m, error) {
 	err = loadRandomArtifacts(decompressedMap, h3m)
 	// ----- ~ Load random artifacts ~ -----
 
+	// ----- ??? -----
+	// #TODO: Fix - save to map
+	err = loadAvailableSpells(decompressedMap, h3m)
+	err = loadAvailableSkills(decompressedMap, h3m)
+	// ----- ~ ??? ~ -----
+
 	// ----- Rumors -----
 	err = loadRumors(decompressedMap, h3m)
 	// ----- ~ Rumors ~ -----
@@ -236,6 +242,21 @@ func loadRumors(decompressedMap io.ReadSeeker, m *H3m) error {
 	return nil
 }
 
+func loadAvailableSpells(decompressedMap io.ReadSeeker, m *H3m) error {
+	// #TODO: Save to map
+	var availableSpells = make([]byte, 6)
+	err := binary.Read(decompressedMap, binary.LittleEndian, &availableSpells)
+
+	return err
+}
+
+func loadAvailableSkills(decompressedMap io.ReadSeeker, m *H3m) error {
+	// #TODO: Save to map
+	var availableSkills = make([]byte, 7)
+	err := binary.Read(decompressedMap, binary.LittleEndian, &availableSkills)
+	return err
+}
+
 func loadRandomArtifacts(decompressedMap io.ReadSeeker, m *H3m) error {
 	currentOffset, err := decompressedMap.Seek(0, io.SeekCurrent)
 	if err != nil {
@@ -294,7 +315,7 @@ func loadAvailableHeroes(decompressedMap io.ReadSeeker, m *H3m) error {
 		return err
 	}
 
-	fmt.Printf("Teams offset: %d\n", currentOffset)
+	fmt.Printf("Available heroes offset: %d\n", currentOffset)
 
 	var availableHeroes models.AvailableHeroes
 

@@ -328,9 +328,21 @@ func Test_loadRumors(t *testing.T) {
 
 			}
 
-			if h3m.Rumors != nil {
-				t.Errorf("loadRumors() got = %v, want %v", h3m.Rumors, nil)
+			if len(h3m.Rumors) != len(tt.rumors) {
+				t.Errorf("loadRumors() got = %v, want %v", h3m.Rumors, tt.rumors)
 				return
+			}
+
+			for i, expectedRumor := range tt.rumors {
+				if h3m.Rumors[i].Name != expectedRumor.Name {
+					t.Errorf("loadRumors() got = %v, want %v", h3m.Rumors[i].Name, expectedRumor.Name)
+					return
+				}
+
+				if h3m.Rumors[i].Text != expectedRumor.Text {
+					t.Errorf("loadRumors() got = %v, want %v", h3m.Rumors[i].Text, expectedRumor.Text)
+					return
+				}
 			}
 		})
 	}
