@@ -108,7 +108,26 @@ func Load(fileName string) (*H3m, error) {
 	err = loadHeroSettings(decompressedMap, h3m)
 	// ----- ~ Hero settings ~ -----
 
+	// ----- Land map -----
+	err = loadMap(decompressedMap, h3m)
+	// ----- ~ Land map ~ -----
+
 	return h3m, nil
+}
+
+func loadMap(decompressedMap io.ReadSeeker, m *H3m) error {
+	currentOffset, err := decompressedMap.Seek(0, io.SeekCurrent)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Land map offset: %d\n", currentOffset)
+
+	landMap := make([]models.MapTile, m.MapSize*m.MapSize)
+
+	err = binary.Read(decompressedMap, binary.LittleEndian, &landMap)
+
+	return nil
 }
 
 func loadHeroSettings(decompressedMap io.ReadSeeker, m *H3m) error {

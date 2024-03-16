@@ -23,8 +23,8 @@ func TestLoad(t *testing.T) {
 		//	wantErr: false,
 		//},
 		{
-			name:    "generated.h3m",
-			args:    args{fileName: "generated.h3m"},
+			name:    "test_maps/test_1.h3m",
+			args:    args{fileName: "test_maps/test_1.h3m"},
 			want:    &H3m{Format: "H3M"},
 			wantErr: false,
 		},
