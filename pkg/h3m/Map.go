@@ -19,4 +19,5 @@ type H3m struct {
 	Artifacts        [18]byte
 	Rumors           []*models.Rumor
 	Heroes           []*models.Hero
+	LandMap          []models.MapTile
 }

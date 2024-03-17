@@ -127,6 +127,12 @@ func loadMap(decompressedMap io.ReadSeeker, m *H3m) error {
 
 	err = binary.Read(decompressedMap, binary.LittleEndian, &landMap)
 
+	if err != nil {
+		return err
+	}
+
+	m.LandMap = landMap
+
 	return nil
 }
 

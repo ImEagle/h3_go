@@ -16,7 +16,7 @@ func TestReader_Read(t *testing.T) {
 
 	lodReader := lod.NewReader("/Users/eagle/Downloads/h3/H3sprite.lod")
 	lodReader.LoadMetadata()
-	defPayload, err := lodReader.GetFile("cpixie.def")
+	defPayload, err := lodReader.GetFile("dirttl.def")
 	if err != nil {
 		panic(err)
 	}
