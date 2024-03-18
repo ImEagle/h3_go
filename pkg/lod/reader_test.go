@@ -2,6 +2,7 @@ package lod
 
 import (
 	"fmt"
+	"github.com/ImEagle/h3_go/pkg/def"
 	"reflect"
 	"testing"
 )
@@ -34,6 +35,39 @@ func TestReader_LoadMetadata(t *testing.T) {
 			data, err := r.GetFile("sgelwa5.pcx")
 			//_, _ = r.GetFile("ara_cobl.pcx")
 			fmt.Print(data, err)
+		})
+	}
+}
+
+func TestReader_loadTerrain(t *testing.T) {
+	tests := []struct {
+		name           string
+		spriteFileName string
+		assetName      string
+		wantError      bool
+	}{
+		{
+			name:           "example",
+			spriteFileName: "/Users/eagle/projects/h3_go/pkg/h3m/test_maps/dirt_only.h3m",
+			assetName:      "sandtl.def",
+			wantError:      false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := NewReader(tt.spriteFileName)
+			r.LoadMetadata()
+
+			imgDetails, err := r.GetFile(tt.assetName)
+			if (err != nil) != tt.wantError {
+				t.Errorf("loadTerrain() error = %v, wantError %v", err, tt.wantError)
+				return
+			}
+
+			dr := def.NewReader()
+			dr.Load(imgDetails)
+
 		})
 	}
 }

@@ -8,8 +8,8 @@ import (
 )
 
 func main() {
-	mapName := "/Users/eagle/projects/h3_go/pkg/h3m/test_maps/test_1.h3m"
-	lodName := "/Users/eagle/Downloads/h3/h3ab_bmp.lod"
+	mapName := "/Users/eagle/projects/h3_go/pkg/h3m/test_maps/dirt_only.h3m"
+	lodName := "/Users/eagle/Downloads/h3/h3sprite.lod"
 
 	h3Map, err := h3m.Load(mapName)
 	if err != nil {

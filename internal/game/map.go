@@ -6,6 +6,7 @@ import (
 	"github.com/ImEagle/h3_go/pkg/lod"
 	"github.com/hajimehoshi/ebiten/v2"
 	"image"
+	_ "image/png"
 )
 
 func NewRendered(mapData *h3m.H3m, spriteManager *lod.Reader) *Renderer {
@@ -38,7 +39,7 @@ func (r *Renderer) Draw(screen *ebiten.Image) {
 			w := x + tileSize
 			h := y + tileSize
 
-			tileImg := r.getLandImage(tileInfo.SurfacePicture)
+			tileImg := r.getLandImage(tileInfo.Surface)
 
 			if tileImg == nil {
 				continue
@@ -59,7 +60,7 @@ func (r *Renderer) Draw(screen *ebiten.Image) {
 
 func (r *Renderer) getLandImage(landType byte) *ebiten.Image {
 	spriteMapper := map[byte]string{
-		0: "dirt",
+		0: "dirttl.def",
 		1: "sandtl.def",
 		2: "grass",
 		3: "snow",
