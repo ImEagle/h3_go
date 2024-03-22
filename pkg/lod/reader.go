@@ -148,6 +148,7 @@ func (r *Reader) GetFile(fileName string) ([]byte, error) {
 	// If def pkg.def.Reader ???
 	// debugging day #2
 	// nop day #3
+	// debugging day #4
 
 	// EncodeImage
 	pcx := isPCX(data)
