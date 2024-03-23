@@ -53,6 +53,9 @@ func TestReader_Read(t *testing.T) {
 				fmt.Print(md.Frames)
 			}
 
+			// sprite from frames(?)
+			// frames, horizontalCount, order
+
 		})
 	}
 }

@@ -3,10 +3,22 @@ package def
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"io"
 )
 
 const SpriteSheetType = 0x42
+
+type frame struct {
+	Size       uint32
+	Format     uint32
+	FullWidth  uint32
+	FullHeight uint32
+	Width      uint32
+	Height     uint32
+	LeftMargin uint32
+	TopMargin  uint32
+}
 
 type header struct {
 	Type        uint32
@@ -51,8 +63,42 @@ func (r *Reader) Load(data []byte) error {
 		r.blocks = append(r.blocks, *blck)
 	}
 
+	r.fetchImages(bReader)
+
 	debug := 1
 	debug += 1
+
+	return nil
+}
+
+func (r *Reader) fetchImages(bReader *bytes.Reader) error {
+
+	firstFullWidth := -1
+	firstFullHeight := -1
+
+	for i := uint32(0); i < r.header.BlocksCount; i++ {
+		// different block = different frames?
+
+		for _, offset := range r.blocks[i].Offsets {
+			var imgFrame frame
+
+			bReader.Seek(int64(offset), io.SeekStart)
+			binary.Read(bReader, binary.LittleEndian, &imgFrame)
+
+			if (imgFrame.LeftMargin > imgFrame.FullWidth) || (imgFrame.TopMargin > imgFrame.FullHeight) {
+				return errors.New("margins are higher than dimensions")
+			}
+
+			// https://gitlab.mister-muffin.de/josch/lodextract/src/branch/main/defextract.py#L92
+			if firstFullWidth == -1 && firstFullHeight == -1 {
+				firstFullWidth = int(imgFrame.FullWidth)
+				firstFullHeight = int(imgFrame.FullHeight)
+			} else {
+				// TODO
+			}
+
+		}
+	}
 
 	return nil
 }
