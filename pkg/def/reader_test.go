@@ -42,7 +42,7 @@ func TestReader_Read(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := NewReader()
-			err := r.Load(tt.args.data)
+			images, err := r.Load(tt.args.data)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Load() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -53,8 +53,7 @@ func TestReader_Read(t *testing.T) {
 				fmt.Print(md.Frames)
 			}
 
-			// sprite from frames(?)
-			// frames, horizontalCount, order
+			print(len(images))
 
 		})
 	}

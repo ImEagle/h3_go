@@ -8,10 +8,8 @@ import (
 	"image"
 	"image/color"
 	"image/draw"
-	"image/png"
 	_ "image/png"
 	"io"
-	"os"
 )
 
 const SpriteSheetType = 0x42
@@ -34,6 +32,11 @@ type header struct {
 	BlocksCount uint32
 }
 
+type ImageDetails struct {
+	Image   image.Image
+	Details string
+}
+
 func NewReader() *Reader {
 	return &Reader{
 		header:  header{},
@@ -48,37 +51,41 @@ type Reader struct {
 	blocks  []block
 }
 
-func (r *Reader) Load(data []byte) error {
+func (r *Reader) Load(data []byte) ([]ImageDetails, error) {
 	bReader := bytes.NewReader(data)
 
 	// Load header
 	if err := binary.Read(bReader, binary.LittleEndian, &r.header); err != nil {
-		return err
+		return nil, err
 	}
 
 	err := binary.Read(bReader, binary.LittleEndian, &r.palette)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	for i := uint32(0); i < r.header.BlocksCount; i++ {
 		blck, err := readBlock(bReader)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		r.blocks = append(r.blocks, *blck)
 	}
 
-	r.fetchImages(bReader)
+	images, err := r.fetchImages(bReader)
+	if err != nil {
+		return nil, err
+	}
 
 	debug := 1
 	debug += 1
 
-	return nil
+	return images, nil
 }
 
-func (r *Reader) fetchImages(bReader *bytes.Reader) error {
+func (r *Reader) fetchImages(bReader *bytes.Reader) ([]ImageDetails, error) {
+	imgDetails := make([]ImageDetails, 0)
 
 	firstFullWidth := -1
 	firstFullHeight := -1
@@ -94,7 +101,7 @@ func (r *Reader) fetchImages(bReader *bytes.Reader) error {
 			binary.Read(bReader, binary.LittleEndian, &imgFrame)
 
 			if (imgFrame.LeftMargin > imgFrame.FullWidth) || (imgFrame.TopMargin > imgFrame.FullHeight) {
-				return errors.New("margins are higher than dimensions")
+				return nil, errors.New("margins are higher than dimensions")
 			}
 
 			// https://gitlab.mister-muffin.de/josch/lodextract/src/branch/main/defextract.py#L92
@@ -116,7 +123,7 @@ func (r *Reader) fetchImages(bReader *bytes.Reader) error {
 
 				if firstFullHeight < int(imgFrame.FullHeight) {
 					firstFullHeight = int(imgFrame.FullHeight)
-					return errors.New("first height smaller than latter one")
+					return nil, errors.New("first height smaller than latter one")
 				}
 
 				if imgFrame.Width != 0 || imgFrame.Height != 0 {
@@ -124,24 +131,27 @@ func (r *Reader) fetchImages(bReader *bytes.Reader) error {
 						var err error
 						pixelData, err = extractFromFormat0(imgFrame, bReader)
 						if err != nil {
-							return err
+							return nil, err
 						}
 
 					}
 
 				}
 
-				err := debugCreateImageFromBytes(pixelData, r.palette, imgFrame, fmt.Sprintf("image_%d.png", i))
+				img, err := debugCreateImageFromBytes(pixelData, r.palette, imgFrame)
 				if err != nil {
-					return err
+					return nil, err
 				}
 
+				imgDetails = append(imgDetails, ImageDetails{
+					Image:   img,
+					Details: fmt.Sprintf("Block: %d, Frame: %d", i, offset),
+				})
 			}
-
 		}
 	}
 
-	return nil
+	return imgDetails, nil
 }
 
 func extractFromFormat0(imgFrame frame, reader *bytes.Reader) ([]byte, error) {
@@ -223,7 +233,7 @@ func readString(f io.Reader, len int) (string, error) {
 	return string(fileName), nil
 }
 
-func debugCreateImageFromBytes(data []byte, palette []byte, imgFrame frame, fileName string) error {
+func debugCreateImageFromBytes(data []byte, palette []byte, imgFrame frame) (*image.RGBA, error) {
 
 	pal := make([]color.Color, len(palette)/3)
 	for i := 0; i < len(palette); i += 3 {
@@ -247,21 +257,7 @@ func debugCreateImageFromBytes(data []byte, palette []byte, imgFrame frame, file
 	draw.Draw(im, im.Bounds(), &image.Uniform{color.RGBA{0, 0, 0, 0}}, image.Point{}, draw.Src)
 	draw.Draw(im, im.Bounds(), imRGB, image.Point{int(imgFrame.LeftMargin), int(imgFrame.TopMargin)}, draw.Src)
 
-	// Create or open the file for writing
-	file, err := os.Create(fileName)
-	if err != nil {
-		return fmt.Errorf("error creating/opening file: %v", err)
-	}
-	defer file.Close()
-
-	// Save the image to the file in PNG format
-	err = png.Encode(file, im)
-	if err != nil {
-		return fmt.Errorf("error encoding image to PNG: %v", err)
-	}
-
-	fmt.Printf("Image successfully saved to %s\n", fileName)
-	return nil
+	return im, nil
 }
 
 func replaceColor(img *image.RGBA, newColor color.RGBA, palette []uint8, paletteIndex uint8) {
