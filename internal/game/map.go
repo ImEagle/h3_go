@@ -1,7 +1,7 @@
 package game
 
 import (
-	"bytes"
+	"github.com/ImEagle/h3_go/pkg/def"
 	"github.com/ImEagle/h3_go/pkg/h3m"
 	"github.com/ImEagle/h3_go/pkg/lod"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -39,7 +39,7 @@ func (r *Renderer) Draw(screen *ebiten.Image) {
 			w := x + tileSize
 			h := y + tileSize
 
-			tileImg := r.getLandImage(tileInfo.Surface)
+			tileImg := r.getLandImage(tileInfo.Surface, tileInfo.SurfacePicture)
 
 			if tileImg == nil {
 				continue
@@ -58,7 +58,7 @@ func (r *Renderer) Draw(screen *ebiten.Image) {
 
 }
 
-func (r *Renderer) getLandImage(landType byte) *ebiten.Image {
+func (r *Renderer) getLandImage(landType byte, pictureIndex byte) *ebiten.Image {
 	spriteMapper := map[byte]string{
 		0: "dirttl.def",
 		1: "sandtl.def",
@@ -77,17 +77,16 @@ func (r *Renderer) getLandImage(landType byte) *ebiten.Image {
 		return nil
 	}
 
-	imgData, err := r.spriteManager.GetFile(spriteName)
+	defPayload, err := r.spriteManager.GetFile(spriteName)
 	if err != nil {
 		return nil
 	}
 
-	imgReader := bytes.NewReader(imgData)
-	img, _, err := image.Decode(imgReader)
+	defReader := def.NewReader()
+	images, err := defReader.Load(defPayload)
 	if err != nil {
 		return nil
 	}
 
-	ebitImage := ebiten.NewImageFromImage(img)
-	return ebitImage
+	return ebiten.NewImageFromImage(images[pictureIndex].Image)
 }
