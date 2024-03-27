@@ -77,6 +77,7 @@ func (r *Renderer) getLandImage(landType byte, pictureIndex byte) *ebiten.Image 
 		return nil
 	}
 
+	// TODO: Add cache for the files
 	defPayload, err := r.spriteManager.GetFile(spriteName)
 	if err != nil {
 		return nil
