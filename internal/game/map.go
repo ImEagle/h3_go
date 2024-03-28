@@ -1,7 +1,6 @@
 package game
 
 import (
-	"github.com/ImEagle/h3_go/pkg/def"
 	"github.com/ImEagle/h3_go/pkg/h3m"
 	"github.com/ImEagle/h3_go/pkg/lod"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -10,15 +9,18 @@ import (
 )
 
 func NewRendered(mapData *h3m.H3m, spriteManager *lod.Reader) *Renderer {
+
+	memSprites := NewInMemorySpriteManager(spriteManager)
+
 	return &Renderer{
 		mapData:       mapData,
-		spriteManager: spriteManager,
+		spriteManager: memSprites,
 	}
 }
 
 type Renderer struct {
 	mapData       *h3m.H3m
-	spriteManager *lod.Reader
+	spriteManager SpriteManager
 }
 
 func (r *Renderer) Draw(screen *ebiten.Image) {
@@ -78,13 +80,7 @@ func (r *Renderer) getLandImage(landType byte, pictureIndex byte) *ebiten.Image 
 	}
 
 	// TODO: Add cache for the files
-	defPayload, err := r.spriteManager.GetFile(spriteName)
-	if err != nil {
-		return nil
-	}
-
-	defReader := def.NewReader()
-	images, err := defReader.Load(defPayload)
+	images, err := r.spriteManager.Get(spriteName)
 	if err != nil {
 		return nil
 	}
