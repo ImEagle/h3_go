@@ -51,6 +51,20 @@ func (r *Renderer) Draw(screen *ebiten.Image) {
 
 			dioX := float64(int(mapX) * tileSize)
 			dioY := float64(int(mapY) * tileSize)
+
+			if tileInfo.TerrainFlipX() && tileInfo.TerrainFlipY() {
+				dio.GeoM.Scale(-1, -1)
+				dio.GeoM.Translate(float64(tileSize), float64(tileSize))
+			} else if tileInfo.TerrainFlipX() && !tileInfo.TerrainFlipY() {
+				dio.GeoM.Scale(-1, 1)
+				dio.GeoM.Translate(float64(tileSize), 0)
+			} else if !tileInfo.TerrainFlipX() && tileInfo.TerrainFlipY() {
+				dio.GeoM.Scale(1, -1)
+				dio.GeoM.Translate(0, float64(tileSize))
+			} else if !tileInfo.TerrainFlipX() && !tileInfo.TerrainFlipY() {
+				dio.GeoM.Scale(1, 1)
+			}
+
 			dio.GeoM.Translate(dioX, dioY)
 
 			screen.DrawImage(subImage, dio)
@@ -64,14 +78,14 @@ func (r *Renderer) getLandImage(landType byte, pictureIndex byte) *ebiten.Image 
 	spriteMapper := map[byte]string{
 		0: "dirttl.def",
 		1: "sandtl.def",
-		2: "grass",
-		3: "snow",
-		4: "swamp",
-		5: "rough",
-		6: "subterranean",
-		7: "lava",
-		8: "water",
-		9: "rock",
+		2: "grastl.def",
+		3: "snowtl.def",
+		4: "swmptl.def",
+		5: "rougtl.def",
+		6: "subbtl.def",
+		7: "lavatl.def",
+		8: "watrtl.def",
+		9: "rocktl.dev",
 	}
 
 	spriteName, ok := spriteMapper[landType]
@@ -83,6 +97,12 @@ func (r *Renderer) getLandImage(landType byte, pictureIndex byte) *ebiten.Image 
 	images, err := r.spriteManager.Get(spriteName)
 	if err != nil {
 		return nil
+	}
+
+	if pictureIndex >= byte(len(images)) {
+		// TODO: Fix this
+		lastIdx := len(images) - 1
+		return ebiten.NewImageFromImage(images[lastIdx].Image)
 	}
 
 	return ebiten.NewImageFromImage(images[pictureIndex].Image)

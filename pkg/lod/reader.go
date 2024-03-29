@@ -160,7 +160,7 @@ func (r *Reader) GetFile(fileName string) ([]byte, error) {
 		}
 
 		// debug
-		err = imageToFile(pcxImg, "/Users/eagle/tmp/"+fileName+".png")
+		//err = imageToFile(pcxImg, "/Users/eagle/tmp/"+fileName+".png")
 		if err != nil {
 			panic(err)
 		}
