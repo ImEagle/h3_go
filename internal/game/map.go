@@ -41,6 +41,7 @@ func (r *Renderer) Draw(screen *ebiten.Image) {
 			w := x + tileSize
 			h := y + tileSize
 
+			// Note: Debugging invalid images
 			tileImg := r.getLandImage(tileInfo.Surface, tileInfo.SurfacePicture)
 
 			if tileImg == nil {
