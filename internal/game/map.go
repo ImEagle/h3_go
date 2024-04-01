@@ -43,6 +43,7 @@ func (r *Renderer) Draw(screen *ebiten.Image) {
 
 			// Note: Debugging invalid images
 			// NOP
+			// NOP
 			tileImg := r.getLandImage(tileInfo.Surface, tileInfo.SurfacePicture)
 
 			if tileImg == nil {
