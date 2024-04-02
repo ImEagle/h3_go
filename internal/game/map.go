@@ -78,6 +78,9 @@ func (r *Renderer) Draw(screen *ebiten.Image) {
 }
 
 func (r *Renderer) getLandImage(landType byte, pictureIndex byte) *ebiten.Image {
+	// pictureIndex for map start from 1
+	// sprite manager starts from 0
+
 	spriteMapper := map[byte]string{
 		0: "dirttl.def",
 		1: "sandtl.def",
@@ -102,11 +105,5 @@ func (r *Renderer) getLandImage(landType byte, pictureIndex byte) *ebiten.Image 
 		return nil
 	}
 
-	if pictureIndex >= byte(len(images)) {
-		// TODO: Fix this
-		lastIdx := len(images) - 1
-		return ebiten.NewImageFromImage(images[lastIdx].Image)
-	}
-
-	return ebiten.NewImageFromImage(images[pictureIndex].Image)
+	return ebiten.NewImageFromImage(images[pictureIndex-1].Image)
 }
