@@ -91,7 +91,7 @@ func (r *Renderer) getLandImage(landType byte, pictureIndex byte) *ebiten.Image 
 		6: "subbtl.def",
 		7: "lavatl.def",
 		8: "watrtl.def",
-		9: "rocktl.dev",
+		9: "rocktl.def",
 	}
 
 	spriteName, ok := spriteMapper[landType]
