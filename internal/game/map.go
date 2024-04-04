@@ -99,11 +99,19 @@ func (r *Renderer) getLandImage(landType byte, pictureIndex byte) *ebiten.Image 
 		return nil
 	}
 
-	// TODO: Add cache for the files
 	images, err := r.spriteManager.Get(spriteName)
 	if err != nil {
 		return nil
 	}
 
-	return ebiten.NewImageFromImage(images[pictureIndex-1].Image)
+	pictureIndex--
+	if pictureIndex < 0 {
+		pictureIndex = 0
+	}
+
+	if int(pictureIndex) >= len(images) {
+		pictureIndex = byte(len(images) - 1)
+	}
+
+	return ebiten.NewImageFromImage(images[pictureIndex].Image)
 }
