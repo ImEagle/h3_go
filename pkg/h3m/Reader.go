@@ -112,7 +112,53 @@ func Load(fileName string) (*H3m, error) {
 	err = loadMap(decompressedMap, h3m)
 	// ----- ~ Land map ~ -----
 
+	// ----- Underground map -----
+	if h3m.HasUnderground {
+		err = loadUndergroundMap(decompressedMap, h3m)
+	}
+	// ----- ~ Underground map ~ -----
+
+	// ----- Map objects -----
+	err = loadMapObjects(decompressedMap, h3m)
+	// ----- ~ Map objects ~ -----
+
 	return h3m, nil
+}
+
+func loadMapObjects(decompressedMap io.ReadSeeker, m *H3m) error {
+	currentOffset, err := decompressedMap.Seek(0, io.SeekCurrent)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Objects offset: %d\n", currentOffset)
+
+	var objectsCount uint32
+	err = binary.Read(decompressedMap, binary.LittleEndian, &objectsCount)
+
+	if err != nil {
+		return err
+	}
+
+	for i := uint32(0); i < objectsCount; i++ {
+		var object models.MapObjectDefinition
+		object.SpriteName, err = readString(decompressedMap)
+		if err != nil {
+			return err
+		}
+
+		var mapObjectData models.MapObjectData
+		err = binary.Read(decompressedMap, binary.LittleEndian, &mapObjectData)
+		if err != nil {
+			return err
+		}
+
+		object.MapObjectData = &mapObjectData
+
+		m.Objects = append(m.Objects, &object)
+	}
+
+	return nil
 }
 
 func loadMap(decompressedMap io.ReadSeeker, m *H3m) error {
@@ -132,6 +178,27 @@ func loadMap(decompressedMap io.ReadSeeker, m *H3m) error {
 	}
 
 	m.LandMap = landMap
+
+	return nil
+}
+
+func loadUndergroundMap(decompressedMap io.ReadSeeker, m *H3m) error {
+	currentOffset, err := decompressedMap.Seek(0, io.SeekCurrent)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Land map offset: %d\n", currentOffset)
+
+	landMap := make([]models.MapTile, m.MapSize*m.MapSize)
+
+	err = binary.Read(decompressedMap, binary.LittleEndian, &landMap)
+
+	if err != nil {
+		return err
+	}
+
+	m.UndergroundMap = landMap
 
 	return nil
 }

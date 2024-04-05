@@ -20,4 +20,6 @@ type H3m struct {
 	Rumors           []*models.Rumor
 	Heroes           []*models.Hero
 	LandMap          []models.MapTile
+	UndergroundMap   []models.MapTile
+	Objects          []*models.MapObjectDefinition
 }
