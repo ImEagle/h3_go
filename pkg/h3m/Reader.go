@@ -118,6 +118,10 @@ func Load(fileName string) (*H3m, error) {
 	}
 	// ----- ~ Underground map ~ -----
 
+	// ----- Map objects definitions -----
+	err = loadMapObjectsDefinitions(decompressedMap, h3m)
+	// ----- ~ Map objects definitions ~ -----
+
 	// ----- Map objects -----
 	err = loadMapObjects(decompressedMap, h3m)
 	// ----- ~ Map objects ~ -----
@@ -131,7 +135,47 @@ func loadMapObjects(decompressedMap io.ReadSeeker, m *H3m) error {
 		return err
 	}
 
-	fmt.Printf("Objects offset: %d\n", currentOffset)
+	fmt.Printf("ObjectsDefinition offset: %d\n", currentOffset)
+
+	var objectsCount uint32
+	err = binary.Read(decompressedMap, binary.LittleEndian, &objectsCount)
+
+	if err != nil {
+		return err
+	}
+
+	for i := uint32(0); i < objectsCount; i++ {
+		var object models.MapObjectPosition
+		err = binary.Read(decompressedMap, binary.LittleEndian, &object)
+		if err != nil {
+			return err
+		}
+
+		//m.ObjectsDefinition = append(m.ObjectsDefinition, &object)
+
+		// Skip 5 bytes
+		// struct based on object definition
+		// events, monster, ...
+		objectDef := m.ObjectsDefinition[object.ObjectDefIndex]
+
+		switch objectDef.Class {
+		case models.AltarOfSacrifice:
+			break
+
+		}
+
+	}
+
+	return nil
+}
+
+func loadMapObjectsDefinitions(decompressedMap io.ReadSeeker, m *H3m) error {
+	currentOffset, err := decompressedMap.Seek(0, io.SeekCurrent)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("ObjectsDefinition definition offset: %d\n", currentOffset)
 
 	var objectsCount uint32
 	err = binary.Read(decompressedMap, binary.LittleEndian, &objectsCount)
@@ -155,7 +199,7 @@ func loadMapObjects(decompressedMap io.ReadSeeker, m *H3m) error {
 
 		object.MapObjectData = &mapObjectData
 
-		m.Objects = append(m.Objects, &object)
+		m.ObjectsDefinition = append(m.ObjectsDefinition, &object)
 	}
 
 	return nil

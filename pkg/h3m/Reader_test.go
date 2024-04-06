@@ -347,3 +347,49 @@ func Test_loadRumors(t *testing.T) {
 		})
 	}
 }
+
+func Test_loadMapObjects(t *testing.T) {
+	type args struct {
+		mapFileName string
+	}
+	tests := []struct {
+		name              string
+		args              args
+		objectsDefinition []models.MapObjectDefinition
+	}{
+		{
+			name: "mapa-teren-zasoby.h3m",
+			args: args{mapFileName: "test_maps/mapa-teren-zasoby.h3m"},
+			objectsDefinition: []models.MapObjectDefinition{
+				{
+					MapObjectData: &models.MapObjectData{
+						PassableSquares: [6]byte{},
+						ActiveSquare:    [6]byte{},
+						Landscape:       [2]byte{},
+						LandscapeGroup:  [2]byte{},
+						Class:           0,
+						Number:          0,
+						Group:           0,
+						OverOrBelow:     0,
+						Unknown:         [16]byte{},
+					},
+					SpriteName: "",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			h3m, err := Load(tt.args.mapFileName)
+			if err != nil {
+				t.Errorf("loadRumors() error = %v", err)
+				return
+			}
+
+			if len(h3m.ObjectsDefinition) != len(tt.objectsDefinition) {
+				t.Errorf("loadObjectsDefinition() got = %v, want %v", h3m.ObjectsDefinition, tt.objectsDefinition)
+				return
+			}
+		})
+	}
+}

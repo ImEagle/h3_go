@@ -10,15 +10,16 @@ type MapObjectData struct {
 	ActiveSquare    [6]byte
 	Landscape       [2]byte
 	LandscapeGroup  [2]byte
-	Class           [4]byte
-	Number          [4]byte
+	Class           uint32
+	Number          uint32
 	Group           byte
 	OverOrBelow     byte
 	Unknown         [16]byte
 }
 
 type MapObjectPosition struct {
-	X uint8
-	Y uint8
-	Z uint8
+	X              uint8
+	Y              uint8
+	Z              uint8
+	ObjectDefIndex uint32
 }

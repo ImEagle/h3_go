@@ -11,15 +11,15 @@ type H3m struct {
 	Description    string
 	Difficulty     byte
 
-	Players          []*models.Player
-	VictoryCondition *models.VictoryCondition
-	LossCondition    *models.LoseCondition
-	TeamColors       *models.TeamColors
-	CustomHeroes     []*models.CustomHeroes
-	Artifacts        [18]byte
-	Rumors           []*models.Rumor
-	Heroes           []*models.Hero
-	LandMap          []models.MapTile
-	UndergroundMap   []models.MapTile
-	Objects          []*models.MapObjectDefinition
+	Players           []*models.Player
+	VictoryCondition  *models.VictoryCondition
+	LossCondition     *models.LoseCondition
+	TeamColors        *models.TeamColors
+	CustomHeroes      []*models.CustomHeroes
+	Artifacts         [18]byte
+	Rumors            []*models.Rumor
+	Heroes            []*models.Hero
+	LandMap           []models.MapTile
+	UndergroundMap    []models.MapTile
+	ObjectsDefinition []*models.MapObjectDefinition
 }
