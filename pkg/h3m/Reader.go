@@ -6,6 +6,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"github.com/ImEagle/h3_go/pkg/h3m/models"
+	"github.com/ImEagle/h3_go/pkg/h3m/models/objects"
 	"io"
 	"os"
 )
@@ -159,7 +160,11 @@ func loadMapObjects(decompressedMap io.ReadSeeker, m *H3m) error {
 		objectDef := m.ObjectsDefinition[object.ObjectDefIndex]
 
 		switch objectDef.Class {
-		case models.AltarOfSacrifice:
+		case models.Resource:
+			res, err := objects.ReadResource(decompressedMap)
+			if err != nil {
+				return err
+			}
 			break
 
 		}
@@ -186,7 +191,7 @@ func loadMapObjectsDefinitions(decompressedMap io.ReadSeeker, m *H3m) error {
 
 	for i := uint32(0); i < objectsCount; i++ {
 		var object models.MapObjectDefinition
-		object.SpriteName, err = readString(decompressedMap)
+		object.SpriteName, err = ReadString(decompressedMap)
 		if err != nil {
 			return err
 		}
@@ -305,7 +310,7 @@ func loadHeroSettings(decompressedMap io.ReadSeeker, m *H3m) error {
 
 		if customBiography {
 			var err error
-			hd.Biography, err = readString(decompressedMap)
+			hd.Biography, err = ReadString(decompressedMap)
 			if err != nil {
 				return nil
 			}
@@ -361,12 +366,12 @@ func loadRumors(decompressedMap io.ReadSeeker, m *H3m) error {
 	for i := uint32(0); i < rumorsCount; i++ {
 		var rumor models.Rumor
 
-		rumor.Name, err = readString(decompressedMap)
+		rumor.Name, err = ReadString(decompressedMap)
 		if err != nil {
 			return err
 		}
 
-		rumor.Text, err = readString(decompressedMap)
+		rumor.Text, err = ReadString(decompressedMap)
 		if err != nil {
 			return err
 		}
@@ -429,7 +434,7 @@ func loadCustomHeroes(decompressedMap io.ReadSeeker, m *H3m) error {
 			return err
 		}
 
-		customHero.Name, err = readString(decompressedMap)
+		customHero.Name, err = ReadString(decompressedMap)
 		if err != nil {
 			return err
 		}
@@ -539,12 +544,12 @@ func loadBasicMapParameters(decompressedMap io.Reader, h3m *H3m) error {
 	binary.Read(decompressedMap, binary.LittleEndian, &h3m.MapSize)
 	binary.Read(decompressedMap, binary.LittleEndian, &h3m.HasUnderground)
 
-	h3m.Name, err = readString(decompressedMap)
+	h3m.Name, err = ReadString(decompressedMap)
 	if err != nil {
 		return err
 	}
 
-	h3m.Description, err = readString(decompressedMap)
+	h3m.Description, err = ReadString(decompressedMap)
 	if err != nil {
 		return err
 
@@ -598,7 +603,7 @@ func loadPlayersData(decompressedMap io.ReadSeeker, h3m *H3m) error {
 		var heroFace uint8
 		binary.Read(decompressedMap, binary.LittleEndian, &heroFace)
 
-		heroName, err := readString(decompressedMap.(io.Reader))
+		heroName, err := ReadString(decompressedMap.(io.Reader))
 		if err != nil {
 			return err
 		}
@@ -621,7 +626,7 @@ func loadPlayersData(decompressedMap io.ReadSeeker, h3m *H3m) error {
 			var heroId uint8
 			binary.Read(decompressedMap, binary.LittleEndian, &heroId)
 
-			heroName, err := readString(decompressedMap)
+			heroName, err := ReadString(decompressedMap)
 			if err != nil {
 				return err
 			}
@@ -652,7 +657,7 @@ func decompressGZIP(gzipedR io.Reader) (io.ReadSeeker, error) {
 	return out, nil
 }
 
-func readString(r io.Reader) (string, error) {
+func ReadString(r io.Reader) (string, error) {
 	var len uint32
 	binary.Read(r, binary.LittleEndian, &len)
 

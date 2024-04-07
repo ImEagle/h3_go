@@ -20,5 +20,12 @@ func NewObjectsRenderer(mapData *h3m.H3m, spriteManager *lod.Reader) *ObjectsRen
 }
 
 func (r *ObjectsRenderer) Draw() {
-	// NOP
+	tileSize := 32
+
+	var mapSize, mapY, mapX uint32
+	mapSize = r.mapData.MapSize
+
+	for objDef := range r.mapData.ObjectsDefinition {
+		// NOP
+	}
 }
