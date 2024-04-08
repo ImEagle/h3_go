@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	mapName := "/Users/eagle/projects/h3_go/pkg/h3m/test_maps/mapa-teren.h3m"
+	mapName := "/Users/eagle/projects/h3_go/pkg/h3m/generated.h3m"
 	lodName := "/Users/eagle/Downloads/h3/h3sprite.lod"
 
 	h3Map, err := h3m.Load(mapName)
@@ -20,8 +20,9 @@ func main() {
 	h3Sprites.LoadMetadata()
 
 	gameRenderer := game.NewRendered(h3Map, h3Sprites)
-	fullGame := NewGame(gameRenderer)
+	objectsRenderer := game.NewObjectsRenderer(h3Map, h3Sprites)
+	fullGame := NewGame(gameRenderer, objectsRenderer)
 
-	ebiten.SetWindowSize(1024, 768)
+	ebiten.SetWindowSize(1500, 1000)
 	ebiten.RunGame(fullGame)
 }

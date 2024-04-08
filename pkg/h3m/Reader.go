@@ -157,14 +157,24 @@ func loadMapObjects(decompressedMap io.ReadSeeker, m *H3m) error {
 		// Skip 5 bytes
 		// struct based on object definition
 		// events, monster, ...
+
+		if object.ObjectDefIndex >= uint32(len(m.ObjectsDefinition)) {
+			return fmt.Errorf("Object definition index out of range: %d", object.ObjectDefIndex)
+		}
+
 		objectDef := m.ObjectsDefinition[object.ObjectDefIndex]
+		objectDef.MapObjectPosition = &object
+
+		// Why 5 bytes?
+		decompressedMap.Seek(5, io.SeekCurrent)
 
 		switch objectDef.Class {
 		case models.Resource:
-			res, err := objects.ReadResource(decompressedMap)
+			_, err := objects.ReadResource(decompressedMap)
 			if err != nil {
 				return err
 			}
+
 			break
 
 		}

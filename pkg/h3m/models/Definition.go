@@ -3,6 +3,7 @@ package models
 type MapObjectDefinition struct {
 	*MapObjectData
 	SpriteName string
+	*MapObjectPosition
 }
 
 type MapObjectData struct {

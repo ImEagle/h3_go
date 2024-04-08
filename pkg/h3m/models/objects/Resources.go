@@ -2,7 +2,6 @@ package objects
 
 import (
 	"encoding/binary"
-	"github.com/ImEagle/h3_go/pkg/h3m"
 	"io"
 )
 
@@ -15,7 +14,7 @@ func ReadResource(decompressedMap io.ReadSeeker) (*Resource, error) {
 	}
 
 	if hasMessage {
-		message, err := h3m.ReadString(decompressedMap)
+		message, err := readString(decompressedMap)
 		if err != nil {
 			return nil, err
 		}
@@ -39,4 +38,16 @@ func ReadResource(decompressedMap io.ReadSeeker) (*Resource, error) {
 
 type Resource struct {
 	Message string
+}
+
+func readString(r io.Reader) (string, error) {
+	var len uint32
+	binary.Read(r, binary.LittleEndian, &len)
+
+	text := make([]byte, len)
+	_, err := r.Read(text)
+	if err != nil {
+		return "", err
+	}
+	return string(text), nil
 }
