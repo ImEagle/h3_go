@@ -174,7 +174,19 @@ func loadMapObjects(decompressedMap io.ReadSeeker, m *H3m) error {
 			if err != nil {
 				return err
 			}
+			break
+		case models.RandomMonster:
+			if m.Format != HeaderRoEName {
+				decompressedMap.Seek(4, io.SeekCurrent)
+			}
 
+			_, err := objects.ReadRandomMonster(decompressedMap, m.Format)
+			if err != nil {
+				return err
+			}
+
+		default:
+			fmt.Println("Unknown object class ", objectDef.Class)
 			break
 
 		}
