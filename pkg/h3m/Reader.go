@@ -176,6 +176,7 @@ func loadMapObjects(decompressedMap io.ReadSeeker, m *H3m) error {
 			}
 			break
 		case models.RandomMonster:
+			// Debug
 			if m.Format != HeaderRoEName {
 				decompressedMap.Seek(4, io.SeekCurrent)
 			}
