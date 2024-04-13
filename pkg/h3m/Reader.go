@@ -179,6 +179,7 @@ func loadMapObjects(decompressedMap io.ReadSeeker, m *H3m) error {
 			// Debug
 			// Debug 2
 			// NOP
+			// NOP
 
 			if m.Format != HeaderRoEName {
 				decompressedMap.Seek(4, io.SeekCurrent)
