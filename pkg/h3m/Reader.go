@@ -176,16 +176,6 @@ func loadMapObjects(decompressedMap io.ReadSeeker, m *H3m) error {
 			}
 			break
 		case models.RandomMonster:
-			// Debug
-			// Debug 2
-			// NOP
-			// NOP
-			// Debug 3
-
-			if m.Format != HeaderRoEName {
-				decompressedMap.Seek(4, io.SeekCurrent)
-			}
-
 			_, err := objects.ReadRandomMonster(decompressedMap, m.Format)
 			if err != nil {
 				return err
@@ -695,4 +685,22 @@ func ReadString(r io.Reader) (string, error) {
 		return "", err
 	}
 	return string(text), nil
+}
+
+func ReadMessageIfSet(r io.Reader) (bool, string, error) {
+	var hasMsg bool
+	err := binary.Read(r, binary.LittleEndian, &hasMsg)
+	if err != nil {
+		return false, "", err
+	}
+
+	if hasMsg {
+		message, err := ReadString(r)
+		if err != nil {
+			return false, "", err
+		}
+		return true, message, nil
+	}
+
+	return false, "", nil
 }
