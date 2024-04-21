@@ -386,11 +386,7 @@ func Test_loadMapObjects(t *testing.T) {
 				return
 			}
 
-			// NOP
-			// NOP
-			// NOP
-			// NOP
-			// NOP
+			// Debugging objects position
 
 			if len(h3m.ObjectsDefinition) != len(tt.objectsDefinition) {
 				t.Errorf("loadObjectsDefinition() got = %v, want %v", h3m.ObjectsDefinition, tt.objectsDefinition)

@@ -2,7 +2,7 @@ package objects
 
 import (
 	"encoding/binary"
-	"github.com/ImEagle/h3_go/pkg/h3m"
+	"github.com/ImEagle/h3_go/pkg/h3m/helpers"
 	"io"
 )
 
@@ -26,7 +26,7 @@ func ReadRandomMonster(decompressedMap io.ReadSeeker, mapType string) (*RandomMo
 		return nil, err
 	}
 
-	hasMsg, msg, err := h3m.ReadMessageIfSet(decompressedMap)
+	hasMsg, msg, err := helpers.ReadMessageIfSet(decompressedMap)
 	if hasMsg {
 		randomMonster.Message = msg
 		var resources MonsterResources
@@ -43,7 +43,7 @@ func ReadRandomMonster(decompressedMap io.ReadSeeker, mapType string) (*RandomMo
 	decompressedMap.Seek(2, io.SeekCurrent)
 
 	// TODO: How to check HOTA3 feature
-	featureLevelHOTA3 := true
+	featureLevelHOTA3 := false
 	if featureLevelHOTA3 {
 		var featureHOTA3 MonsterFeatureHOTA3
 		binary.Read(decompressedMap, binary.LittleEndian, &featureHOTA3)
@@ -62,7 +62,7 @@ type RandomMonster struct {
 	NotGrown   bool
 }
 
-type MonsterResources struct {
+type MonsterResources struct { // or monsters?
 	Res1 uint32 // Gold?
 	Res2 uint32 // Wood?
 	Res3 uint32 // Ore?
