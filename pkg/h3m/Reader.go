@@ -177,6 +177,7 @@ func loadMapObjects(decompressedMap io.ReadSeeker, m *H3m) error {
 			}
 			break
 		case models.RandomMonster:
+			// Debug
 			_, err := objects.ReadRandomMonster(decompressedMap, m.Format)
 			if err != nil {
 				return err
