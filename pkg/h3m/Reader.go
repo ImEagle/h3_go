@@ -137,7 +137,7 @@ func loadMapObjects(decompressedMap io.ReadSeeker, m *H3m) error {
 		return err
 	}
 
-	fmt.Printf("ObjectsDefinition offset: %d\n", currentOffset)
+	fmt.Printf("MapObjects offset: %d\n", currentOffset)
 
 	var objectsCount uint32
 	err = binary.Read(decompressedMap, binary.LittleEndian, &objectsCount)
@@ -147,6 +147,13 @@ func loadMapObjects(decompressedMap io.ReadSeeker, m *H3m) error {
 	}
 
 	for i := uint32(0); i < objectsCount; i++ {
+		currentOffset, err := decompressedMap.Seek(0, io.SeekCurrent)
+		if err != nil {
+			return err
+		}
+
+		fmt.Printf("Objects item [%d] offset: %d\n", i, currentOffset)
+
 		var object models.MapObjectPosition
 		err = binary.Read(decompressedMap, binary.LittleEndian, &object)
 		if err != nil {
