@@ -25,4 +25,6 @@ func main() {
 
 	ebiten.SetWindowSize(1500, 1000)
 	ebiten.RunGame(fullGame)
+
+	// NOP
 }
