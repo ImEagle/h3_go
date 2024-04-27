@@ -27,4 +27,5 @@ func main() {
 	ebiten.RunGame(fullGame)
 
 	// NOP
+	// NOP
 }
